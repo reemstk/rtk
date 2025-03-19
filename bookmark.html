@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Bookmark Manager</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <style>
+    /* General Styles */
+
+    .container {
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .mb-3 {
+      margin: 0;
+      padding-top: 20px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    /* Add Folder and Bookmark Section */
+
+    .add-bookmark select {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .input-boot {
+      padding: .375rem .75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--bs-body-color);
+      background-color: var(--bs-body-bg);
+      background-clip: padding-box;
+      border: var(--bs-border-width) solid var(--bs-border-color);
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      border-radius: var(--bs-border-radius);
+      transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    /* Bookmark List */
+    .bookmark-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .bookmark-list li {
+      margin-bottom: 20px;
+    }
+
+    .bookmark-list h3 {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+
+    .bookmark-list a {
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 50%;
+      text-align: center;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+    }
+
+    #duplicates-list {
+      list-style: none;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    #duplicates-list li {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+
+    .view-buttons {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .bookmark-list,
+    .bookmark-library {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .bookmark-library {
+      margin-top: 15px;
+    }
+
+    .library-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .library-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      text-align: center;
+    }
+
+    .library-card h3 {
+      font-size: 1.1em;
+      margin: 10px 0;
+    }
+
+    .library-card p {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .library-card a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .library-card button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .library-card button:hover {
+      background-color: #0056b3;
+    }
+
+    .add-library-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+    }
+
+    .add-library-card:hover {
+      background-color: #f9f9f9;
+    }
+
+    .library-card {
+      position: relative;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .more-options {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+
+    .pinned {
+      border: 2px solid gold;
+    }
+
+    .pin-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: gold;
+      font-size: 20px;
+    }
+
+
+    .bookmark-library {
+      margin-top: 20px;
+    }
+
+    .library-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .library-card button {
+      background-color: #007bff;
+      border: none;
+      padding: 5px 10px;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .library-card button:hover {
+      background-color: #0056b3;
+    }
+
+    .add-library-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+    }
+
+    .add-library-card:hover {
+      background-color: #f8f9fa;
+    }
+
+    .divider {
+      border-top: 2px solid #ddd;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <div class="container">
+    <h3><i class="fa-solid fa-bookmark"></i> Bookmark Manager</h3>
+
+    <div class="btn-group view-buttons" role="group" aria-label="Basic example">
+      <button type="button" class="btn btn-secondary" id="list-view-btn" onclick="showView('list')">List
+        View</button>
+      <button type="button" class="btn btn-secondary" id="library-view-btn" onclick="showView('library')">Library
+        View</button>
+    </div>
+
+    <div class="search-container d-flex justify-content-between">
+      <input type="text" id="search-input" class="form-control fa-search w-50" placeholder="Search bookmarks..."
+        aria-label="Search for bookmarks" onkeyup="searchBookmarks()" />
+
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="settingsDropdown"
+            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Open settings">
+            <i class="fa-solid fa-gear" aria-hidden="true"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
+            <li><button class="dropdown-item" onclick="requestCalendarAccess()">
+              <i class="fa-solid fa-calendar-plus"></i> Configure Calendar
+            </button></li>
+            <li><button class="dropdown-item" id="export-bookmarks-btn">Export as JSON</button></li>
+            <li><button class="dropdown-item" id="export-html-btn">Export as HTML</button></li>
+          </ul>
+        </div>
+    </div>
+
+    <!-- List View -->
+    <div id="list-view" class="table-responsive bookmark-list active">
+      <ul id="folders-view" class="list-group mb-3"></ul>
+      <table class="table table-bordered" aria-label="Bookmark list">
+        <thead>
+          <tr>
+            <!--  <th onclick="sortTable(0)">Folder <i class="fa-solid fa-sort"></i></th> -->
+            <th onclick="sortTable(1)">Name <i class="fa-solid fa-sort"></i></th>
+            <th onclick="sortTable(2)">URL <i class="fa-solid fa-sort"></i></th>
+            <th onclick="sortTable(3)">Label <i class="fa-solid fa-sort"></i></th>
+            <th onclick="sortTable(4)">Modified Date<i class="fa-solid fa-sort"></i></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="list-view-content"></tbody>
+      </table>
+    </div>
+
+    <!-- Library View -->
+    <div id="library-view" class="bookmark-library">
+      <div id="library-grid" class="">
+        <!-- Library and bookmarks will be dynamically inserted here -->
+        <div class="add-library-card" onclick="addNewLibrary()">
+          <h3>New Library</h3>
+        </div>
+      </div>
+      <div id="list-library"></div>
+    </div>
+
+
+    <!-- Auto-Clean Section -->
+    <div class="auto-clean-section mb-3">
+      <label for="duplicate-detection">Find Duplicates By:</label>
+      <select id="duplicate-detection" class="input-boot">
+        <option selected="" value="url">URL</option>
+        <option value="name">Name</option>
+        <option value="both">Both Name and URL</option>
+      </select>
+      <button id="preview-duplicates-btn" type="button" class="btn btn-secondary"><i class="fa fa-eye"></i>Preview
+        Duplicates</button>
+      <button id="auto-clean-btn" type="button" class="btn btn-secondary" onclick="autoCleanDuplicates()"><i
+          class="fa-solid fa-broom"></i> Auto-Clean
+        Duplicates</button>
+    </div>
+
+  </div>
+  <div class="container">
+
+    <div><button id="auto-clean-btn" type="button" class="btn btn-secondary" onclick="addCurrentPageToBookmarks()"><i
+          class="fa-solid fa-bookmark"></i> Bookmark My Page</button></div>
+    <!-- Add Bookmark Section -->
+    <div class="divider"></div>
+    <h4>Add Bookmark</h4>
+
+    <div class="input-group mb-3">
+      <input type="text" id="folder-name" class="form-control" placeholder="Folder Name" aria-label="Folder Name"
+        aria-describedby="button-addon2">
+      <div class="input-group-prepend" id="button-addon3">
+        <button id="add-folder-btn" class="btn btn-secondary" type="button" aria-label="Add selected folder"><i
+            class="fa-solid fa-plus"></i></button>
+        <button id="delete-folder-btn" class="btn btn-secondary" type="button" aria-label="Delete selected folder">
+          <i class="fa-solid fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="input-group mb-3">
+      <input type="text" id="label-name" class="form-control" placeholder="Label" aria-label="Label"
+        aria-describedby="button-addon2">
+      <div class="input-group-prepend" id="button-addon3">
+        <button id="add-label-btn" class="btn btn-secondary" type="button" aria-label="Add selected label"><i
+            class="fa-solid fa-add"></i></button>
+        <button id="delete-label-btn" class="btn btn-secondary" type="button" aria-label="Delete selected label"><i
+            class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+
+    <!-- Add Bookmark Section -->
+    <div class="add-bookmark input-group mb-3">
+      <select id="folder-select">
+        <option disabled="" selected="" value="">Folder</option>
+      </select>
+      <input id="bookmark-name" placeholder="Bookmark Name" type="text" class="form-control" />
+      <input id="bookmark-url" placeholder="URL" type="url" class="form-control" />
+      <select id="label-select" class="form-control">
+        <option disabled="" selected="" value="">Label</option>
+      </select>
+      <button id="add-bookmark-btn" class="btn btn-secondary" type="button" aria-label="Bookmark url">Bookmark</button>
+    </div>
+
+    <!-- Bookmark List -->
+    <div class="row mb-3 bg-light border">
+      <div class="col">
+        <h6>Available Folders</h6>
+        <ul id="folders"></ul>
+      </div>
+      <div class="col">
+        <h6>Available Labels</h6>
+        <ul id="labels"></ul>
+      </div>
+    </div>
+
+    <!-- Modal for Previewing Duplicates -->
+    <div class="modal" id="preview-modal">
+      <div class="modal-content">
+        <h4>Duplicate Bookmarks<span class="close" id="close-modal">×</span></h4>
+        <ul id="duplicates-list"></ul>
+        <button id="confirm-clean-btn" type="button" class="btn btn-secondary" onclick="autoCleanDuplicates()"
+          aria-label="COnfirm Auto-clean">Confirm
+          Auto-Clean</button>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+<script>
+  // JavaScript Code for Bookmark Manager
+
+  const folders = { "bookmark": [] };
+  const labels = { "default": [] };
+  let sortDirection = {};
+  let pinnedLibrary = null;
+
+  // Add Folder
+  document.getElementById('add-folder-btn').addEventListener('click', () => {
+    const folderName = document.getElementById('folder-name').value.trim();
+    if (!folderName) return alert('Please enter a folder name!');
+    if (folders[folderName]) return alert('Folder already exists!');
+    folders[folderName] = [];
+    updateFolderDropdowns();
+    updateFolderList();
+    renderListView();
+    document.getElementById('folder-name').value = '';
+  });
+
+  // Add Labels
+  document.getElementById('add-label-btn').addEventListener('click', () => {
+    const labelName = document.getElementById('label-name').value.trim();
+    if (!labelName) return alert('Please enter a label name!');
+    if (labels[labelName]) return alert('Label already exists!');
+    labels[labelName] = [];
+    updateLabelDropdowns();
+    updateLabelList();
+    document.getElementById('label-name').value = '';
+  });
+
+  // Add Bookmark
+  document.getElementById('add-bookmark-btn').addEventListener('click', () => {
+    const folderName = document.getElementById('folder-select').value;
+    const labelName = document.getElementById('label-select').value;
+    const bookmarkName = document.getElementById('bookmark-name').value.trim();
+    const bookmarkUrl = document.getElementById('bookmark-url').value.trim();
+    if (!folderName || !labelName || !bookmarkName || !bookmarkUrl) return alert('Please fill in all fields!');
+
+    const dateAdded = new Date().toISOString();
+    folders[folderName].push({ name: bookmarkName, url: bookmarkUrl, label: labelName, date_added: dateAdded });
+    labels[labelName].push({ name: bookmarkName, url: bookmarkUrl, folder: folderName, date_added: dateAdded });
+
+    updateFolderList();
+    updateLabelList();
+    renderListView();
+    renderLibraryView();
+    document.getElementById('bookmark-name').value = '';
+    document.getElementById('bookmark-url').value = '';
+  });
+
+
+  // Update Folder Dropdowns
+  function updateFolderDropdowns() {
+    const folderSelect = document.getElementById('folder-select');
+    folderSelect.innerHTML = '<option value="" disabled selected>Folder</option>';
+    for (const folderName in folders) {
+      const option1 = document.createElement('option');
+      option1.value = folderName;
+      option1.textContent = folderName;
+      folderSelect.appendChild(option1);
+    }
+  }
+
+  // Update Label Dropdowns
+  function updateLabelDropdowns() {
+    const labelSelect = document.getElementById('label-select');
+    labelSelect.innerHTML = '<option value="" disabled selected>Label</option>';
+    for (const labelName in labels) {
+      const option1 = document.createElement('option');
+      option1.value = labelName;
+      option1.textContent = labelName;
+      labelSelect.appendChild(option1);
+    }
+  }
+
+
+  function updateLabelList() {
+    const labelsList = document.getElementById('labels');
+    labelsList.innerHTML = '';
+    for (const label in labels) {
+      const listItem = document.createElement('li');
+      listItem.textContent = label;
+      labelsList.appendChild(listItem);
+    }
+    populateDropdowns();
+  }
+
+  function updateFolderList() {
+    const foldersList = document.getElementById('folders');
+    foldersList.innerHTML = '';
+    for (const folderName in folders) {
+      const folderItem = document.createElement('li');
+      folderItem.textContent = folderName;
+      foldersList.appendChild(folderItem);
+    }
+    populateDropdowns();
+  }
+
+  // Export as JSON
+  document.getElementById('export-bookmarks-btn').addEventListener('click', () => {
+    const bookmarksData = JSON.stringify(folders, null, 2);
+    const blob = new Blob([bookmarksData], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'bookmarks.json';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  });
+
+  // Export as HTML
+  document.getElementById('export-html-btn').addEventListener('click', () => {
+    let htmlContent = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Exported Bookmarks</title></head><body><h1>Exported Bookmarks</h1>';
+    for (const folderName in folders) {
+      htmlContent += `<h2>${folderName}</h2><ul>`;
+      folders[folderName].forEach((bookmark) => {
+        htmlContent += `<li><a href="${bookmark.url}" target="_blank">${bookmark.name}</a></li>`;
+      });
+      htmlContent += '</ul>';
+    }
+    htmlContent += '</body></html>';
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'bookmarks.html';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  });
+
+  // Preview Duplicates
+  document.getElementById('preview-duplicates-btn').addEventListener('click', () => {
+    const detectionType = document.getElementById('duplicate-detection').value;
+    const seenItems = new Set();
+    const duplicates = [];
+    for (const folderName in folders) {
+      folders[folderName].forEach((bookmark) => {
+        let identifier;
+        if (detectionType === 'url') identifier = bookmark.url;
+        else if (detectionType === 'name') identifier = bookmark.name.toLowerCase();
+        else identifier = `${bookmark.name.toLowerCase()}|${bookmark.url}`;
+        if (seenItems.has(identifier)) duplicates.push({ ...bookmark, folder: folderName });
+        else seenItems.add(identifier);
+      });
+    }
+    const duplicatesList = document.getElementById('duplicates-list');
+    duplicatesList.innerHTML = '';
+    if (duplicates.length === 0) duplicatesList.innerHTML = '<li>No duplicates found!</li>';
+    else duplicates.forEach((duplicate) => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${duplicate.name} (${duplicate.url}) - Folder: ${duplicate.folder}`;
+      duplicatesList.appendChild(listItem);
+    });
+    document.getElementById('preview-modal').style.display = 'block';
+  });
+
+  // Auto-Clean Duplicates
+  function autoCleanDuplicates() {
+    const criteria = document.getElementById('duplicate-detection').value;
+    const seenItems = new Set();
+
+    for (const folder in folders) {
+      folders[folder] = folders[folder].filter((bookmark) => {
+        let identifier = getIdentifier(bookmark, criteria);
+        if (seenItems.has(identifier)) {
+          if (labels[bookmark.label]) {
+            labels[bookmark.label] = labels[bookmark.label].filter(b => getIdentifier(b, criteria) !== identifier);
+          }
+          return false; // Remove duplicate
+        } else {
+          seenItems.add(identifier);
+          return true; // Keep first instance
+        }
+      });
+    }
+    updateFolderList();
+    updateLabelList();
+    renderLibraryView();
+    renderListView();
+    document.getElementById('preview-modal').style.display = 'none';
+    alert("Auto-clean completed! Duplicates removed.");
+  }
+
+  function getIdentifier(bookmark, criteria) {
+    if (criteria === 'url') return bookmark.url;
+    if (criteria === 'name') return bookmark.name.toLowerCase();
+    return `${bookmark.name.toLowerCase()}|${bookmark.url}`; // Both name and URL
+  }
+
+  // Close Modal
+  document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('preview-modal').style.display = 'none';
+  });
+
+  //show view
+  function showView(view) {
+    document.querySelector('.bookmark-list').classList.remove('active');
+    document.querySelector('.bookmark-library').classList.remove('active');
+    if (view === 'list') {
+      document.getElementById('list-view').classList.add('active');
+      renderListView();
+    } else if (view === 'library') {
+      document.getElementById('library-view').classList.add('active');
+      renderLibraryView();
+    }
+    document.getElementById('list-view-btn').classList.toggle('active', view === 'list');
+    document.getElementById('library-view-btn').classList.toggle('active', view === 'library');
+    updateFolderList();
+    updateLabelList();
+  }
+
+  //delete bookmark
+  function deleteBookmark(folder, url) {
+    //if (folder === "bookmark") return alert("Cannot delete bookmark folder items.");
+    folders[folder] = folders[folder].filter(b => b.url !== url);
+    renderListView();
+    renderLibraryView();
+    updateFolderDropdowns();
+    updateFolderList();
+    updateLabelDropdowns();
+    updateLabelList();
+  }
+
+  //render folder
+  function renderFolderList() {
+    let folderList = document.getElementById('folders');
+    folderList.innerHTML = '';
+    for (let folder in folders) {
+      let li = document.createElement('li');
+      li.className = 'list-group-item';
+      li.textContent = folder;
+      folderList.appendChild(li);
+    }
+  }
+
+  //render list
+  function renderListView() {
+    let content = document.getElementById('list-view-content');
+    content.innerHTML = '';
+    /*
+    for (let folder in folders) {
+        folders[folder].forEach(bookmark => {
+            let row = `<tr>
+        <td>${folder}</td>
+        <td>${bookmark.name}</td>
+        <td><a href="${bookmark.url}" target="_blank">${bookmark.url}</a></td>
+        <td>${bookmark.label}</td>
+        <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
+        <td><button class='btn btn-sm btn-danger' onclick='deleteBookmark("${folder}", "${bookmark.name}")' aria-label="Delete bookmark">Delete</button></td>
+      </tr>`;
+            content.innerHTML += row;
+        });
+    }
+    */
+    for (let folderName in folders) {
+      let folderRow = document.createElement("tr");
+      folderRow.classList.add("folder-row");
+      folderRow.innerHTML = `
+                    <td colspan="5" onclick="toggleFolder('${folderName}')">
+                        <i id="icon-${folderName}" class="fa-solid fa-folder-open folder-icon"></i> ${folderName}
+                    </td>
+                `;
+      content.appendChild(folderRow);
+
+      folders[folderName].forEach(bookmark => {
+        let bookmarkRow = document.createElement("tr");
+        bookmarkRow.classList.add("bookmark-row", `folder-${folderName}`);
+        bookmarkRow.innerHTML = `
+                        <td>${bookmark.name}</td>
+                        <td><a href="${bookmark.url}" target="_blank">${bookmark.url}</a></td>
+                        <td><span class='badge bg-secondary'>${bookmark.label}</span></td>
+                        <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
+                            <td>
+                              <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add calender reminder"><i class="fa-solid fa-calendar-plus"></i></button>
+                              <button class="btn btn-secondary btn-sm" onclick='deleteBookmark("${folderName}", "${bookmark.url}")' aria-label="Delete bookmark"><i class="fa-solid fa-trash"></i></button> 
+                            </td>
+                    `;
+        content.appendChild(bookmarkRow);
+      });
+    }
+  }
+
+  function toggleFolder(folderName) {
+    const rows = document.querySelectorAll(`.folder-${folderName}`);
+    const icon = document.getElementById(`icon-${folderName}`);
+
+    // Ensure the folder icon toggles open/close correctly
+    let isCurrentlyOpen = icon.classList.contains("fa-folder-open");
+    icon.classList.toggle("fa-folder-open", !isCurrentlyOpen);
+    icon.classList.toggle("fa-folder", isCurrentlyOpen);
+
+    rows.forEach(row => row.style.display = !isCurrentlyOpen ? "table-row" : "none");
+  }
+
+  function renderLibraryView() {
+    const libraryGrid = document.getElementById('library-grid');
+    libraryGrid.classList.add("library-grid");
+    libraryGrid.innerHTML = '<div class="add-library-card" onclick="addNewLibrary()"><h5>Add Label</h5><p style="text-align: center;"><i>Only labels associated with bookmarks are displayed in library</i></p></div>';
+    const labelMap = {};
+    for (const folder in folders) {
+      folders[folder].forEach(bookmark => {
+        if (!labelMap[bookmark.label]) {
+          labelMap[bookmark.label] = [];
+        }
+        labelMap[bookmark.label].push(bookmark);
+      });
+    }
+
+    let libraries = Object.keys(labelMap);
+
+    // Ensure pinned library appears first (after add library card)
+    if (pinnedLibrary && libraries.includes(pinnedLibrary)) {
+      libraries = libraries.filter(label => label !== pinnedLibrary);
+      libraries.unshift(pinnedLibrary);
+    }
+
+    for (const label in labelMap) {
+      const card = document.createElement('div');
+      card.classList.add('library-card', 'position-relative');
+      if (pinnedLibrary === label) {
+        card.classList.add('pinned');
+        card.innerHTML += '<i class="fa-solid fa-thumbtack pin-icon"></i>';
+      }
+      card.innerHTML += `
+          <h3 class="library-title"><span class='badge bg-secondary'>${label}</span></h3>
+          <p>${labelMap[label].length} bookmarks</p>
+          <button type="button" class="btn btn-secondary" onclick="openLibrary('${label}')" aria-label="View labelled items">Open</button>
+          <div class="more-options dropdown">
+            <i class="fa-solid fa-ellipsis-vertical" data-bs-toggle="dropdown"></i>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" onclick="togglePinLibrary('${label}')">${pinnedLibrary === label ? 'Unpin' : 'Pin'}</a></li>
+              <li><a class="dropdown-item" onclick="renameLibrary('${label}')">Rename</a></li>
+            </ul>
+          </div>
+        `;
+      libraryGrid.appendChild(card);
+    }
+  }
+
+  function openLibrary(label) {
+    const libraryGrid = document.getElementById('library-grid');
+    libraryGrid.classList.remove("library-grid");
+    libraryGrid.innerHTML = `
+
+      <button type="button" class="btn btn-secondary" onclick="renderLibraryView();" aria-label="Back to Library">Back to Library</button>
+
+      `;
+    const table = document.createElement('table');
+    table.classList.add("table");
+    table.innerHTML = `
+                <thead><tr>
+                    <th>Name</th>
+                    <th>Folder</th>
+                    <th>Added Date</th>
+                    <th>Actions</th>
+                </tr></thead>
+            `;
+    for (const folder in folders) {
+      folders[folder].forEach(bookmark => {
+        if (bookmark.label === label) {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+                            <td>${bookmark.name}</td>
+                            <td>${folder}</td>
+                            <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
+                            <td>
+                              <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add Calendar Reminder"><i class="fa-solid fa-calendar-plus"></i></button>
+                              <button class="btn btn-secondary btn-sm" onclick='deleteBookmark("${folder}", "${bookmark.url}")' aria-label="Delete bookmark"><i class="fa-solid fa-trash"></i></button> 
+                            </td>
+                        `;
+          table.appendChild(row);
+        }
+      });
+    }
+    libraryGrid.appendChild(table);
+  }
+
+  function addNewLibrary() {
+    const label = prompt("Enter new library label:");
+    if (label && !labels[label]) {
+      labels[label] = [];
+      updateLabelList();
+      renderLibraryView();
+      alert(`Library '${label}' added!`);
+    } else {
+      alert("Library label already exists or is invalid.");
+    }
+  }
+
+  //sort
+  function sortTable(columnIndex) {
+    let table = document.querySelector("table");
+    let tbody = table.querySelector("tbody");
+    let rows = Array.from(tbody.querySelectorAll("tr"));
+
+    // Toggle sort direction
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+      let cellA = a.children[columnIndex].textContent.trim().toLowerCase();
+      let cellB = b.children[columnIndex].textContent.trim().toLowerCase();
+
+      // Convert dates to timestamps for proper sorting
+      if (columnIndex === 4) {
+        cellA = new Date(cellA).getTime();
+        cellB = new Date(cellB).getTime();
+      }
+
+      return sortDirection[columnIndex] ? (cellA > cellB ? 1 : -1) : (cellA < cellB ? 1 : -1);
+    });
+
+    tbody.innerHTML = "";
+    rows.forEach(row => tbody.appendChild(row));
+  }
+
+  //SEARCH
+  function searchBookmarks() {
+    let query = document.getElementById('search-input').value.toLowerCase();
+    let content = document.getElementById('list-view-content');
+    let grid = document.getElementById('library-grid');
+    content.innerHTML = '';
+    grid.innerHTML = '<div class="add-library-card" onclick="addNewLibrary()"><h3>Add Library</h3></div>';
+
+    let foundInList = false;
+    let foundInLibrary = false;
+    let labelsMap = {};
+
+    for (let folder in folders) {
+      if (folder.toLowerCase().includes(query)) {
+        foundInList = true;
+        folders[folder].forEach(bookmark => {
+          let row = `<tr>
+              <td>${folder}</td>
+              <td>${bookmark.name}</td>
+              <td><a href="${bookmark.url}" target="_blank">${bookmark.url}</a></td>
+              <td><span class='badge bg-secondary'>${bookmark.label}</span></td>
+              <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
+              <td>
+                <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add calender reminder"><i class="fa-solid fa-calendar-plus"></i></button>
+                <button class="btn btn-secondary btn-sm" onclick='deleteBookmark("${folder}", "${bookmark.url}")' aria-label="Delete selected folder"><i class="fa-solid fa-trash"></i></button> 
+              </td>
+            </tr>`;
+          content.innerHTML += row;
+        });
+      } else {
+        folders[folder].forEach(bookmark => {
+          if (
+            bookmark.name.toLowerCase().includes(query) ||
+            bookmark.label.toLowerCase().includes(query)
+          ) {
+            foundInList = true;
+            let row = `<tr>
+                <td>${folder}</td>
+                <td>${bookmark.name}</td>
+                <td><a href="${bookmark.url}" target="_blank">${bookmark.url}</a></td>
+                <td><span class='badge bg-secondary'>${bookmark.label}</span></td>
+                <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
+                <td><button class='btn btn-sm btn-secondary' onclick='deleteBookmark("${folder}", "${bookmark.url}")'>Delete</button></td>
+              </tr>`;
+            content.innerHTML += row;
+          }
+
+          if (bookmark.label.toLowerCase().includes(query)) {
+            foundInLibrary = true;
+            if (!labelsMap[bookmark.label]) {
+              labelsMap[bookmark.label] = [];
+            }
+            labelsMap[bookmark.label].push(bookmark);
+          }
+        });
+      }
+    }
+
+    if (!foundInList) {
+      content.innerHTML = `<tr><td colspan="6" class="text-center">No bookmarks found</td></tr>`;
+    }
+
+    for (let label in labelsMap) {
+      let cardContent = labelsMap[label].map(b => `<p><a href="${b.url}" target="_blank">${b.name}</a></p>`).join('');
+      let card = `<div class='library-card shadow-card p-3'>
+          <h5><span class='badge bg-secondary'>${label}</span></h5>
+          ${cardContent}
+        </div>`;
+      grid.innerHTML += card;
+    }
+
+    if (!foundInLibrary) {
+      grid.innerHTML += `<p class="text-center">No matching library found</p>`;
+    }
+  }
+
+
+  function togglePinLibrary(label) {
+    pinnedLibrary = pinnedLibrary === label ? null : label;
+    renderLibraryView();
+  }
+
+  // Function to rename a library
+  function renameLibrary(oldLabel) {
+    let newLabel = prompt("Enter new library name:", oldLabel);
+    if (!newLabel || newLabel === oldLabel) return; // Exit if empty or unchanged
+    if (oldLabel === "default") {
+      alert("Cannot rename default label");
+      return;
+    }
+
+    // Update label in all bookmarks
+    for (const folder in folders) {
+      folders[folder].forEach(bookmark => {
+        if (bookmark.label === oldLabel) {
+          bookmark.label = newLabel; // Change label
+        }
+      });
+    }
+
+    // Update label in the labels object
+    if (labels[oldLabel]) {
+      labels[newLabel] = labels[oldLabel]; // Move data
+      delete labels[oldLabel]; // Remove old label
+    }
+
+    // Refresh the UI
+    updateLabelDropdowns();
+    updateLabelList();
+    renderLibraryView();
+    renderListView();
+
+    alert(`Renamed '${oldLabel}' to '${newLabel}' successfully.`);
+  }
+
+
+  function populateDropdowns() {
+    const folderSelect = document.getElementById('folder-select');
+    const labelSelect = document.getElementById('label-select');
+
+    folderSelect.innerHTML = '<option disabled selected value="">Select Folder</option>';
+    labelSelect.innerHTML = '<option disabled selected value="">Select Label</option>';
+
+    for (const folder in folders) {
+      const option = document.createElement('option');
+      option.value = folder;
+      option.textContent = folder;
+      folderSelect.appendChild(option);
+    }
+
+    for (const label in labels) {
+      const option = document.createElement('option');
+      option.value = label;
+      option.textContent = label;
+      labelSelect.appendChild(option);
+    }
+  }
+
+  function requestCalendarAccess() {
+    alert("Would you like to grant access to your calendar?");
+  }
+
+  function addCalendarReminder() {
+    alert("Please configure settings for calendar")
+  }
+
+  document.getElementById('delete-folder-btn').addEventListener('click', () => {
+    const folderName = document.getElementById('folder-name').value.trim();
+
+    if (!folderName) {
+      alert("Please select a folder to delete.");
+      return;
+    }
+
+    if (!folders[folderName]) {
+      alert("Folder does not exist!");
+      return;
+    }
+
+    if (folderName === "bookmark") {
+      alert("Cannot delete the default 'bookmark' folder.");
+      return;
+    }
+
+    // Check if any bookmark in the folder has the "default" label
+    //const hasDefaultLabel = folders[folderName].some(bookmark => bookmark.label === "default");
+
+    //if (hasDefaultLabel) {
+    //    alert(`Cannot delete the folder "${folderName}" because it contains bookmarks with the "default" label.`);
+    //    return;
+    //}
+    if (folderName === "bookmark") {
+      if (confirm(`Cannot delete the default 'bookmark' folder. Confirm to delete the bookmarks associated with the folder "${folderName}"?`)) {
+        delete folders[folderName]; // Remove the folder
+        folders[folderName] = [];
+        updateFolderList();
+        updateFolderDropdowns();
+        updateLabelList();
+        updateLabelDropdowns();
+        renderListView();
+        renderLibraryView();
+        alert(`Bookmarks deleted successfully.`);
+      }
+
+      return;
+    } else
+      // Confirm before deleting
+      if (confirm(`Are you sure you want to delete the folder "${folderName}" and all its bookmarks?`)) {
+        delete folders[folderName]; // Remove the folder
+        updateFolderList();
+        updateFolderDropdowns();
+        updateLabelList();
+        updateLabelDropdowns();
+        renderListView();
+        renderLibraryView();
+        alert(`Folder "${folderName}" deleted successfully.`);
+      }
+
+  });
+
+  document.getElementById('delete-label-btn').addEventListener('click', () => {
+    const labelName = document.getElementById('label-name').value.trim();
+
+    if (!labelName) {
+      alert("Please select a label to delete.");
+      return;
+    }
+
+    if (!labels[labelName]) {
+      alert("Label does not exist!");
+      return;
+    }
+
+    if (labelName === "default") {
+      alert("Cannot delete the 'default' label.");
+      return;
+    }
+
+    // Check if any bookmark in the folder has the "default" label
+    // const hasBookmarkFolder = labels[labelName].some(bookmark => bookmark.folder === "bookmark");
+
+    //if (hasBookmarkFolder) {
+    //    alert(`Cannot delete the label "${labelName}" because has bookmarks from the "bookmark" folder.`);
+    //    return;
+    //}
+
+    // Confirm before deleting
+    if (confirm(`Deleting the label "${labelName}" will cause all associated bookmarks to have 'default' label. Confirm to proceed?`)) {
+
+      // Move all bookmarks from the deleted label to "default"
+      labels[labelName].forEach(bookmark => {
+        // Reassign to default label
+        //bookmark.label = "default";
+        labels["default"].push(bookmark);
+
+      });
+
+      // Update all folders to reflect the label change
+      for (const folderName in folders) {
+        folders[folderName] = folders[folderName].map(bookmark => {
+          if (bookmark.label === labelName) {
+            return { ...bookmark, label: "default" }; // Assign to "default"
+          }
+          return bookmark;
+        });
+      }
+
+      // Delete the label after reassignment
+      delete labels[labelName];
+
+      updateFolderList();
+      updateFolderDropdowns();
+      updateLabelList();
+      updateLabelDropdowns();
+      populateDropdowns();
+      renderListView();
+      renderLibraryView();
+
+      alert(`Label "${labelName}" deleted successfully.`);
+    }
+  });
+
+  function addCurrentPageToBookmarks() {
+    const bookmarkName = document.title;
+    const bookmarkUrl = window.location.href;
+    const folderName = 'bookmark';
+    const labelName = 'default';
+    const dateAdded = new Date().toISOString();
+
+    folders[folderName].push({ name: bookmarkName, url: bookmarkUrl, label: labelName, date_added: dateAdded });
+    labels[labelName].push({ name: bookmarkName, url: bookmarkUrl, folder: folderName, date_added: dateAdded });
+
+    updateFolderList();
+    updateLabelList();
+    renderListView();
+    renderLibraryView();
+
+    alert(`Added "${bookmarkName}" to folder "${folderName}" under label "${labelName}".`);
+  }
+
+  // Initialize with List view
+  showView('list');
+  populateDropdowns();
+</script>
+
+</html>

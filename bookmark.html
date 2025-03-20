@@ -294,7 +294,7 @@
     <div class="search-container d-flex justify-content-between">
       <input type="text" id="search-input" class="form-control fa-search w-50" placeholder="Search bookmarks..."
         aria-label="Search for bookmarks" onkeyup="searchBookmarks()" />
-
+        
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="settingsDropdown"
             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Open settings">
@@ -304,8 +304,14 @@
             <li><button class="dropdown-item" onclick="requestCalendarAccess()">
               <i class="fa-solid fa-calendar-plus"></i> Configure Calendar
             </button></li>
-            <li><button class="dropdown-item" id="export-bookmarks-btn">Export as JSON</button></li>
-            <li><button class="dropdown-item" id="export-html-btn">Export as HTML</button></li>
+            <li><button class="dropdown-item" onclick="alert('Preview: Do you agree to replace your labels with AI generated labels?')">
+              <i class="fa-solid fa-wand-sparkles"></i> Apply auto-label
+            </button></li>
+            <li><button class="dropdown-item" onclick="alert('Preview: AI will match your search content with a one-line thematic summary of bookmarked URLs. AI is prone to error. Do you consent to share your data with AI?')">
+              <i class="fa-solid fa-hat-wizard"></i> Use AI search
+            </button></li>
+            <li><button class="dropdown-item" id="export-bookmarks-btn"><i class="fa-solid fa-download"></i> Export as JSON</button></li>
+            <li><button class="dropdown-item" id="export-html-btn"><i class="fa-solid fa-download"></i> Export as HTML</button></li>
           </ul>
         </div>
     </div>
@@ -320,7 +326,7 @@
             <th onclick="sortTable(1)">Name <i class="fa-solid fa-sort"></i></th>
             <th onclick="sortTable(2)">URL <i class="fa-solid fa-sort"></i></th>
             <th onclick="sortTable(3)">Label <i class="fa-solid fa-sort"></i></th>
-            <th onclick="sortTable(4)">Modified Date<i class="fa-solid fa-sort"></i></th>
+            <th onclick="sortTable(4)">Modified Date <i class="fa-solid fa-sort"></i></th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -348,7 +354,7 @@
         <option value="name">Name</option>
         <option value="both">Both Name and URL</option>
       </select>
-      <button id="preview-duplicates-btn" type="button" class="btn btn-secondary"><i class="fa fa-eye"></i>Preview
+      <button id="preview-duplicates-btn" type="button" class="btn btn-secondary"><i class="fa fa-eye"></i> Preview
         Duplicates</button>
       <button id="auto-clean-btn" type="button" class="btn btn-secondary" onclick="autoCleanDuplicates()"><i
           class="fa-solid fa-broom"></i> Auto-Clean
@@ -369,7 +375,7 @@
         aria-describedby="button-addon2">
       <div class="input-group-prepend" id="button-addon3">
         <button id="add-folder-btn" class="btn btn-secondary" type="button" aria-label="Add selected folder"><i
-            class="fa-solid fa-plus"></i></button>
+            class="fa-solid fa-plus"></i> </button>
         <button id="delete-folder-btn" class="btn btn-secondary" type="button" aria-label="Delete selected folder">
           <i class="fa-solid fa-trash" aria-hidden="true"></i>
         </button>
@@ -381,7 +387,7 @@
         aria-describedby="button-addon2">
       <div class="input-group-prepend" id="button-addon3">
         <button id="add-label-btn" class="btn btn-secondary" type="button" aria-label="Add selected label"><i
-            class="fa-solid fa-add"></i></button>
+            class="fa-solid fa-add"></i> </button>
         <button id="delete-label-btn" class="btn btn-secondary" type="button" aria-label="Delete selected label"><i
             class="fa-solid fa-trash"></i></button>
       </div>
@@ -700,7 +706,7 @@
                         <td><span class='badge bg-secondary'>${bookmark.label}</span></td>
                         <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
                             <td>
-                              <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add calender reminder"><i class="fa-solid fa-calendar-plus"></i></button>
+                              <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add calender reminder"><i class="fa-solid fa-calendar-plus"></i> </button>
                               <button class="btn btn-secondary btn-sm" onclick='deleteBookmark("${folderName}", "${bookmark.url}")' aria-label="Delete bookmark"><i class="fa-solid fa-trash"></i></button> 
                             </td>
                     `;
@@ -759,6 +765,7 @@
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" onclick="togglePinLibrary('${label}')">${pinnedLibrary === label ? 'Unpin' : 'Pin'}</a></li>
               <li><a class="dropdown-item" onclick="renameLibrary('${label}')">Rename</a></li>
+              <li><a class="dropdown-item" onclick="alert('Preview: Share');">Share</a></li>
             </ul>
           </div>
         `;
@@ -793,7 +800,7 @@
                             <td>${folder}</td>
                             <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
                             <td>
-                              <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add Calendar Reminder"><i class="fa-solid fa-calendar-plus"></i></button>
+                              <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add Calendar Reminder"><i class="fa-solid fa-calendar-plus"></i> </button>
                               <button class="btn btn-secondary btn-sm" onclick='deleteBookmark("${folder}", "${bookmark.url}")' aria-label="Delete bookmark"><i class="fa-solid fa-trash"></i></button> 
                             </td>
                         `;
@@ -865,7 +872,7 @@
               <td><span class='badge bg-secondary'>${bookmark.label}</span></td>
               <td>${new Date(bookmark.date_added).toLocaleString('en-US', { timeZoneName: 'short' })}</td>
               <td>
-                <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add calender reminder"><i class="fa-solid fa-calendar-plus"></i></button>
+                <button class="btn btn-secondary btn-sm" onclick='addCalendarReminder()' aria-label="Add calender reminder"><i class="fa-solid fa-calendar-plus"></i> </button>
                 <button class="btn btn-secondary btn-sm" onclick='deleteBookmark("${folder}", "${bookmark.url}")' aria-label="Delete selected folder"><i class="fa-solid fa-trash"></i></button> 
               </td>
             </tr>`;
